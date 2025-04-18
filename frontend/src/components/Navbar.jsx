@@ -1,7 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { getProfile, logoutUser } from '../api/auth';
-import { FaSignInAlt, FaSignOutAlt, FaUserCircle, FaStore } from 'react-icons/fa';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { getProfile, logoutUser } from "../api/auth";
+import {
+  FaSignInAlt,
+  FaSignOutAlt,
+  FaUserCircle,
+  FaStore,
+} from "react-icons/fa";
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -17,7 +22,7 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    if (localStorage.getItem('access')) {
+    if (localStorage.getItem("access")) {
       fetchProfile();
     }
   }, []);
@@ -25,7 +30,7 @@ const Navbar = () => {
   const handleLogout = () => {
     logoutUser();
     setUser(null);
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -39,7 +44,10 @@ const Navbar = () => {
         <ul className="navbar-nav me-auto">
           {user && (
             <li className="nav-item">
-              <Link className="nav-link d-flex align-items-center" to="/profile">
+              <Link
+                className="nav-link d-flex align-items-center"
+                to="/profile"
+              >
                 <FaUserCircle className="me-1" />
                 Perfil
               </Link>
@@ -53,13 +61,19 @@ const Navbar = () => {
               <span className="navbar-text me-3">
                 Olá, {user.full_name || user.username}!
               </span>
-              <button className="btn btn-outline-danger d-flex align-items-center" onClick={handleLogout}>
+              <button
+                className="btn btn-outline-danger d-flex align-items-center"
+                onClick={handleLogout}
+              >
                 <FaSignOutAlt className="me-1" />
                 Sair
               </button>
             </>
           ) : (
-            <Link className="btn btn-outline-primary d-flex align-items-center" to="/login">
+            <Link
+              className="btn btn-outline-primary d-flex align-items-center"
+              to="/login"
+            >
               <FaSignInAlt className="me-1" />
               Login
             </Link>

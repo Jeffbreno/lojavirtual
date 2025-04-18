@@ -1,6 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { getProfile } from '../api/auth';
-import { FaUser, FaUserCircle, FaPhone, FaEnvelope, FaMapMarkedAlt, FaBirthdayCake, FaIdCard } from 'react-icons/fa';
+import React, { useEffect, useState } from "react";
+import { getProfile } from "../api/auth";
+import {
+  FaUser,
+  FaUserCircle,
+  FaPhone,
+  FaEnvelope,
+  FaMapMarkedAlt,
+  FaBirthdayCake,
+  FaIdCard,
+} from "react-icons/fa";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -33,19 +41,20 @@ const ProfilePage = () => {
         </li>
         <li className="list-group-item">
           <FaPhone className="me-2" />
-          <strong>Telefone:</strong> {user.phone || 'Não informado'}
+          <strong>Telefone:</strong> {user.phone || "Não informado"}
         </li>
         <li className="list-group-item">
           <FaIdCard className="me-2" />
-          <strong>CPF/CNPJ:</strong> {user.cpf_cnpj || 'Não informado'}
+          <strong>CPF/CNPJ:</strong> {user.cpf_cnpj || "Não informado"}
         </li>
         <li className="list-group-item">
           <FaBirthdayCake className="me-2" />
-          <strong>Data de nascimento:</strong> {user.birth_date || 'Não informado'}
+          <strong>Data de nascimento:</strong>{" "}
+          {user.birth_date || "Não informado"}
         </li>
         <li className="list-group-item">
           <FaMapMarkedAlt className="me-2" />
-          <strong>Endereço:</strong> {user.address || 'Não informado'}
+          <strong>Endereço:</strong> {user.address || "Não informado"}
         </li>
         <li className="list-group-item">
           <FaEnvelope className="me-2" />
