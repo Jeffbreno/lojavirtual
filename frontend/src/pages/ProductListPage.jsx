@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { fetchProducts } from "../api/products";
 import { Button, Carousel } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import BreadcrumbHeader from "../components/BreadcrumbHeader";
 import ImageZoomModal from "../components/ImageZoomModal";
 import { CartContext } from "../contexts/CartContext";
 
@@ -34,7 +33,6 @@ const ProductListPage = () => {
 
   return (
     <div className="container mt-4">
-      <BreadcrumbHeader title="Vitrine de Produtos" />
 
       <div className="row">
         {products.length === 0 && (

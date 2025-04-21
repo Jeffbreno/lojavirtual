@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../api/auth";
 import { FaSignInAlt, FaLock, FaUser } from "react-icons/fa";
+import { useAuth } from "../contexts/AuthContext";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
@@ -18,7 +19,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await loginUser(credentials.username, credentials.password);
+      await login(credentials.username, credentials.password);
       navigate("/profile");
     } catch (err) {
       setError("Usuário ou senha inválidos");
