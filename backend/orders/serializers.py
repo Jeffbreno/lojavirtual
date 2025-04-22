@@ -1,14 +1,100 @@
 from rest_framework import serializers
 from .models import Order, OrderItem
+from products.models import Product
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    product_name = serializers.ReadOnlyField(source='product.name')
+
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'quantity', 'price']
+        fields = ['id', 'product', 'product_name', 'quantity', 'price']
+        read_only_fields = ['order', 'price']
+
+    def validate(self, data):
+        product = data.get('product')
+        quantity = data.get('quantity')
+
+        if product is None:
+            raise serializers.ValidationError("Produto é obrigatório.")
+
+        if quantity <= 0:
+            raise serializers.ValidationError("Quantidade deve ser maior que zero.")
+
+        # Em caso de criação
+        if self.instance is None:
+            if quantity > product.stock:
+                raise serializers.ValidationError(f"Estoque insuficiente. Disponível: {product.stock}")
+        else:
+            # Em caso de atualização
+            diff = quantity - self.instance.quantity  # Quanto a mais será adicionado
+            if diff > product.stock:
+                raise serializers.ValidationError(f"Estoque insuficiente. Disponível: {product.stock}")
+
+        return data
+    
+    def create(self, validated_data):
+        product = validated_data['product']
+        validated_data['price'] = product.price
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        if 'product' in validated_data:
+            product = validated_data['product']
+            validated_data['price'] = product.price
+        return super().update(instance, validated_data)
+
+class OrderItemCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = ['product', 'quantity']
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    created_at = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
+    total = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'created_at', 'status', 'total', 'items']
+        fields = ['id', 'user', 'status', 'status_display', 'total', 'created_at', 'updated_at', 'items']
+        read_only_fields = ['user', 'total', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        items_data = validated_data.pop('items')
+        user = self.context['request'].user
+        order = Order.objects.create(user=user, status='N', total=0)
+        total = 0
+
+        for item in items_data:
+            product = item['product']
+            quantity = item['quantity']
+            price = product.price
+
+            if quantity > product.stock:
+                raise serializers.ValidationError(
+                    f"Estoque insuficiente para o produto {product.name} (disponível: {product.stock})"
+                )
+
+            OrderItem.objects.create(
+                order=order,
+                product=product,
+                quantity=quantity,
+                price=price
+            )
+            total += price * quantity
+
+        order.total = total
+        order.save()
+        return order
+
+class OrderCreateSerializer(serializers.Serializer):
+    items = serializers.ListField(
+        child=serializers.DictField(
+            child=serializers.IntegerField()
+        )
+    )
+
+    def validate(self, data):
+        if not data.get('items'):
+            raise serializers.ValidationError("Lista de itens não pode estar vazia.")
+        return data
