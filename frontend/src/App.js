@@ -11,6 +11,8 @@ import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import { CartProvider } from "./contexts/CartContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import PedidoFinalizadoPage from "./pages/PedidoFinalizadoPage";
+import MeusPedidosPage from "./pages/MeusPedidosPage";
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
             <Route path="/produtos/:id" element={<ProductDetailPage />} />
             <Route path="/carrinho" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/pedido-finalizado/:id" element={<PedidoFinalizadoPage />} />
+            <Route path="/meus-pedidos" element={<MeusPedidosPage />} />
             <Route
               path="/profile"
               element={

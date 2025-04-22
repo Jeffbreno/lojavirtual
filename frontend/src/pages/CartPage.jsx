@@ -12,7 +12,7 @@ const CartPage = () => {
   );
 
   const handleCheckout = () => {
-    const isAuthenticated = localStorage.getItem("token");
+    const isAuthenticated = localStorage.getItem("access");
     if (!isAuthenticated) {
       navigate("/login");
     } else {

@@ -1,12 +1,14 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { CartContext } from "../contexts/CartContext";
+import { createOrder } from "../api/orders";
 
 const CheckoutPage = () => {
   const { user } = useAuth();
   const { cartItems, clearCart } = useContext(CartContext);
   const navigate = useNavigate();
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!user) {
@@ -21,27 +23,12 @@ const CheckoutPage = () => {
 
   const handleFinalizeOrder = async () => {
     try {
-      const response = await fetch("/api/pedidos/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access")}`,
-        },
-        body: JSON.stringify({
-          items: cartItems.map((item) => ({
-            product: item.id,
-            quantity: item.quantity,
-          })),
-        }),
-      });
-
-      if (!response.ok) throw new Error("Erro ao finalizar o pedido");
-
+      const result = await createOrder(cartItems);
       clearCart();
-      navigate("/meus-pedidos");
-    } catch (error) {
-      console.error(error);
-      alert("Erro ao finalizar o pedido.");
+      navigate(`/pedido-finalizado/${result.id}`);
+    } catch (err) {
+      console.error(err);
+      setError("Erro ao finalizar o pedido. Tente novamente.");
     }
   };
 
@@ -63,6 +50,8 @@ const CheckoutPage = () => {
           <strong>R$ {total.toFixed(2)}</strong>
         </li>
       </ul>
+
+      {error && <div className="alert alert-danger">{error}</div>}
 
       <button
         className="btn btn-success w-100"
