@@ -2,8 +2,6 @@
 from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 from .models import OrderItem
-from products.models import Product
-from decimal import Decimal
 
 # Atualiza o total do pedido
 @receiver([post_save, post_delete], sender=OrderItem)

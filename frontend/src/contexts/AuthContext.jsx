@@ -5,6 +5,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchProfile = async () => {
     try {
@@ -20,6 +21,7 @@ export const AuthProvider = ({ children }) => {
       if (localStorage.getItem("access")) {
         await fetchProfile();
       }
+      setLoading(false);
     };
     initializeUser();
   }, []);
@@ -35,7 +37,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

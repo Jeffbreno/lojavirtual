@@ -26,7 +26,8 @@ api.interceptors.response.use(
 
       try {
         const newAccess = await refreshToken();
-        axios.defaults.headers.common['Authorization'] = `Bearer ${newAccess}`;
+        localStorage.setItem('access', newAccess);
+        api.defaults.headers.common['Authorization'] = `Bearer ${newAccess}`;
         return api(originalRequest);
       } catch (err) {
         logoutUser();

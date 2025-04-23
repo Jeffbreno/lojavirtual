@@ -7,13 +7,17 @@ from products.models import Product
 class OrderStatus(models.TextChoices):
     NEW = 'N', _('Novo')
     PROCESSING = 'P', _('Processando')
+    PAID = 'PA', _('Pago')
     SHIPPED = 'S', _('Enviado')
     DELIVERED = 'D', _('Entregue')
+    FINALIZED = 'F', _('Finalizado')
+    RETURNED = 'R', _('Devolvido')
+    REFUNDED = 'RF', _('Reembolsado')
     CANCELED = 'C', _('Cancelado')
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    status = models.CharField(max_length=1, choices=OrderStatus.choices, default=OrderStatus.NEW)
+    status = models.CharField(max_length=2, choices=OrderStatus.choices, default=OrderStatus.NEW)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

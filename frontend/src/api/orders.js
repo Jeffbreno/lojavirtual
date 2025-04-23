@@ -14,7 +14,14 @@ export const getOrderById = async (id) => {
 
 // Criar novo pedido
 export const createOrder = async (items) => {
-  const response = await api.post('/orders/', { items });
+  const payload = {
+    items: items.map(item => ({
+      product: item.id,
+      quantity: item.quantity
+    }))
+  };
+
+  const response = await api.post('/orders/', payload);
   return response.data;
 };
 

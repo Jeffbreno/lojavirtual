@@ -1,11 +1,5 @@
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
-
-# VIEWS
-from products.views import ProductViewSet, CategoryViewSet, ProductImageViewSet
-from orders.views import OrderViewSet, OrderItemViewSet
-from users.views import UserViewSet
 
 # JWT Authentication
 from rest_framework_simplejwt.views import (
