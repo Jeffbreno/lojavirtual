@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { fetchUserOrders, cancelOrder } from "../api/orders";
+import { getOrderStatusInfo } from "../utils/orderStatus";
+
 
 const MeusPedidosPage = () => {
   const { user } = useAuth();
@@ -45,21 +47,6 @@ const MeusPedidosPage = () => {
 
   const podeCancelar = (status) => ["N", "P", "PA"].includes(status);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "C":
-        return "danger";
-      case "PA":
-        return "success";
-      case "S":
-        return "info";
-      case "D":
-        return "secondary";
-      default:
-        return "dark";
-    }
-  };
-
   if (loading) return <div className="container mt-4">Carregando...</div>;
 
   return (
@@ -70,54 +57,59 @@ const MeusPedidosPage = () => {
       {orders.length === 0 ? (
         <p>Você ainda não realizou nenhum pedido.</p>
       ) : (
-        orders.map((order) => (
-          <div key={order.id} className="card mb-3">
-            <div className="card-header d-flex justify-content-between align-items-center">
-              <span>
-                <strong>Pedido #{order.id}</strong>{" "}
-                <span className={`badge bg-${getStatusColor(order.status)}`}>
-                  {order.status_display}
+        orders.map((order) => {
+          const { label, color, icon } = getOrderStatusInfo(order.status);
+          return (
+            <div key={order.id} className="card mb-3">
+              <div className="card-header d-flex justify-content-between align-items-center">
+                <span>
+                  <strong>Pedido #{order.id}</strong>{" "}
+                  <span className={`badge bg-${color}`}>
+                    {icon} {label}
+                  </span>
                 </span>
-              </span>
-              <span>{order.created_at}</span>
-            </div>
-            <ul className="list-group list-group-flush">
-              {order.items.map((item) => (
-                <li
-                  key={item.id}
-                  className="list-group-item d-flex justify-content-between"
-                >
-                  <div>
-                    {item.product_name || "Produto removido"}{" "}
-                    <small>x {item.quantity}</small>
-                  </div>
-                  <strong>R$ {(item.price * item.quantity).toFixed(2)}</strong>
+                <span>{order.created_at}</span>
+              </div>
+              <ul className="list-group list-group-flush">
+                {order.items.map((item) => (
+                  <li
+                    key={item.id}
+                    className="list-group-item d-flex justify-content-between"
+                  >
+                    <div>
+                      {item.product_name || "Produto removido"}{" "}
+                      <small>x {item.quantity}</small>
+                    </div>
+                    <strong>
+                      R$ {(item.price * item.quantity).toFixed(2)}
+                    </strong>
+                  </li>
+                ))}
+                <li className="list-group-item d-flex justify-content-between">
+                  <strong>Total</strong>
+                  <strong>R$ {Number(order.total).toFixed(2)}</strong>
                 </li>
-              ))}
-              <li className="list-group-item d-flex justify-content-between">
-                <strong>Total</strong>
-                <strong>R$ {Number(order.total).toFixed(2)}</strong>
-              </li>
-            </ul>
+              </ul>
 
-            <div className="card-footer d-flex justify-content-between">
-              <button
-                className="btn btn-outline-primary btn-sm"
-                onClick={() => navigate(`/meus-pedidos/${order.id}`)}
-              >
-                Ver Detalhes
-              </button>
-              {podeCancelar(order.status) && (
+              <div className="card-footer d-flex justify-content-between">
                 <button
-                  className="btn btn-outline-danger btn-sm"
-                  onClick={() => handleCancel(order.id)}
+                  className="btn btn-outline-primary btn-sm"
+                  onClick={() => navigate(`/meus-pedidos/${order.id}`)}
                 >
-                  Cancelar Pedido
+                  Ver Detalhes
                 </button>
-              )}
+                {podeCancelar(order.status) && (
+                  <button
+                    className="btn btn-outline-danger btn-sm"
+                    onClick={() => handleCancel(order.id)}
+                  >
+                    Cancelar Pedido
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        ))
+          );
+        })
       )}
     </div>
   );

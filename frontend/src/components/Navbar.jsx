@@ -79,7 +79,11 @@ const Navbar = () => {
                         Minha Conta
                       </Link>
                     </li>
-                    {/* Você pode adicionar mais itens aqui, como "Meus Pedidos" */}
+                    <li>
+                      <Link className="dropdown-item" to="/meus-pedidos">
+                        Meus Pedidos
+                      </Link>
+                    </li>
                     <li>
                       <hr className="dropdown-divider" />
                     </li>

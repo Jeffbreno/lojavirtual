@@ -1,16 +1,19 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaSignInAlt, FaLock, FaUser } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
   });
   const [error, setError] = useState("");
+
+  const from = location.state?.from?.pathname || '/';
 
   const handleChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -20,7 +23,7 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       await login(credentials.username, credentials.password);
-      navigate("/profile");
+      navigate(from, { replace: true }); 
     } catch (err) {
       setError("Usuário ou senha inválidos");
     }

@@ -14,6 +14,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import PedidoFinalizadoPage from "./pages/PedidoFinalizadoPage";
 import MeusPedidosPage from "./pages/MeusPedidosPage";
 import MeusPedidoDetalhesPage from "./pages/MeusPedidosDetalhePage";
+import RequireAuth from "./components/RequireAuth";
 
 function App() {
   const { loading } = useAuth();
@@ -34,7 +35,14 @@ function App() {
           path="/pedido-finalizado/:id"
           element={<PedidoFinalizadoPage />}
         />
-        <Route path="/meus-pedidos" element={<MeusPedidosPage />} />
+        <Route
+          path="/meus-pedidos"
+          element={
+            <RequireAuth>
+              <MeusPedidosPage />
+            </RequireAuth>
+          }
+        />
         <Route path="/meus-pedidos/:id" element={<MeusPedidoDetalhesPage />} />
         <Route
           path="/profile"

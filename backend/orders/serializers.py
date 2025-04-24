@@ -1,5 +1,11 @@
 from rest_framework import serializers
 from .models import Order, OrderItem
+from .models import OrderStatusLog
+
+class OrderStatusLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderStatusLog
+        fields = ['status', 'changed_at']
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product_name = serializers.ReadOnlyField(source='product.name')
@@ -52,10 +58,11 @@ class OrderSerializer(serializers.ModelSerializer):
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     created_at = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
     total = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    status_logs = OrderStatusLogSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'status', 'status_display', 'total', 'created_at', 'updated_at', 'items']
+        fields = ['id', 'user', 'status', 'status_display', 'total', 'created_at', 'updated_at', 'items', 'status_logs']
         read_only_fields = ['user', 'total', 'created_at', 'updated_at']
 
     def create(self, validated_data):

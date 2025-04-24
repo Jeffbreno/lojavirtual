@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { getOrderById, cancelOrder } from "../api/orders";
+import { getOrderStatusInfo } from "../utils/orderStatus";
+import TimelineStatus from "../components/TimelineStatus";
 
 const MeusPedidosDetalhePage = () => {
   const { id } = useParams();
@@ -54,13 +56,18 @@ const MeusPedidosDetalhePage = () => {
 
   if (!order) return null;
 
+  const { label, color, icon } = getOrderStatusInfo(order.status);
 
   return (
     <div className="container mt-4">
       <h2>Detalhes do Pedido #{order.id}</h2>
       <p>
-        <strong>Status:</strong> {order.status_display}
+        <strong>Status:</strong>{" "}
+        <span className={`badge bg-${color}`}>
+          {icon} {label}
+        </span>
       </p>
+      <TimelineStatus logs={order.status_logs} />
       <p>
         <strong>Data do Pedido:</strong> {order.created_at}
       </p>

@@ -1,7 +1,9 @@
 # orders/signals.py
 from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
-from .models import OrderItem
+from django.utils.timezone import now
+from .models import OrderItem, Order, OrderStatusLog
+from core.middleware import get_current_user
 
 # Atualiza o total do pedido
 @receiver([post_save, post_delete], sender=OrderItem)
@@ -46,3 +48,33 @@ def adjust_stock_on_update(sender, instance, **kwargs):
                     raise ValueError(f"Estoque insuficiente para atualizar {product.name}.")
                 product.stock = new_stock
                 product.save()
+
+@receiver(post_save, sender=Order)
+def create_initial_status_log(sender, instance, created, **kwargs):
+    if created:
+        # Evita duplicar caso o log já exista (por segurança)
+        if not instance.status_logs.exists():
+            OrderStatusLog.objects.create(
+                order=instance,
+                status=instance.status,
+                changed_by=get_current_user(),
+            )
+
+# Cria log quando o status do pedido muda
+@receiver(pre_save, sender=Order)
+def log_order_status_change(sender, instance, **kwargs):
+    if not instance.pk:
+        return  # Novo pedido, ainda não salvo
+
+    try:
+        previous = Order.objects.get(pk=instance.pk)
+    except Order.DoesNotExist:
+        return
+
+    if previous.status != instance.status:
+        OrderStatusLog.objects.create(
+            order=instance,
+            status=instance.status,
+            changed_at=now(),
+            changed_by=get_current_user()
+        )
