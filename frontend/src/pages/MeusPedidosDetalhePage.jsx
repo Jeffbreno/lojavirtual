@@ -4,6 +4,9 @@ import { useAuth } from "../contexts/AuthContext";
 import { getOrderById, cancelOrder } from "../api/orders";
 import { getOrderStatusInfo } from "../utils/orderStatus";
 import TimelineStatus from "../components/TimelineStatus";
+import useNotification from "../hooks/useNotification";
+import GenericModal from "../components/GenericModal";
+import ToastMessage from "../components/ToastMessage";
 
 const MeusPedidosDetalhePage = () => {
   const { id } = useParams();
@@ -13,18 +16,27 @@ const MeusPedidosDetalhePage = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const {
+    toast,
+    showToast,
+    hideToast,
+    modal,
+    showModal,
+    hideModal,
+    confirmModal,
+  } = useNotification();
+
   const loadOrder = React.useCallback(async () => {
     try {
       const data = await getOrderById(id);
       setOrder(data);
     } catch (error) {
-      console.error("Erro ao buscar pedido:", error);
-      alert("Não foi possível carregar os detalhes do pedido.");
+      showToast("Erro ao carregar pedido.", "danger");
       navigate("/meus-pedidos");
     } finally {
       setLoading(false);
     }
-  }, [id, navigate]);
+  }, [id, navigate, showToast]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -36,14 +48,15 @@ const MeusPedidosDetalhePage = () => {
   }, [user, loading, navigate, id, loadOrder]);
 
   const handleCancel = async () => {
-    if (!window.confirm("Tem certeza que deseja cancelar este pedido?")) return;
-
     try {
       await cancelOrder(order.id);
       await loadOrder(); // Recarrega com status atualizado
+      showToast("Pedido cancelado com sucesso!");
     } catch (error) {
       console.error("Erro ao cancelar pedido:", error);
-      alert("Não foi possível cancelar o pedido.");
+      showToast("Erro ao cancelar o pedido.", "danger");
+    } finally {
+      hideModal();
     }
   };
 
@@ -60,6 +73,23 @@ const MeusPedidosDetalhePage = () => {
 
   return (
     <div className="container mt-4">
+      <ToastMessage
+        show={toast.show}
+        message={toast.message}
+        variant={toast.variant}
+        onClose={() => hideToast()}
+      />
+
+      <GenericModal
+        show={modal.show}
+        title={modal.title}
+        body={modal.body}
+        confirmText={modal.confirmText}
+        cancelText={modal.cancelText}
+        onConfirm={confirmModal}
+        onClose={hideModal}
+        variant={modal.variant}
+      />
       <h2>Detalhes do Pedido #{order.id}</h2>
       <p>
         <strong>Status:</strong>{" "}
@@ -95,7 +125,19 @@ const MeusPedidosDetalhePage = () => {
 
       {podeCancelar && (
         <div className="text-end">
-          <button className="btn btn-outline-danger" onClick={handleCancel}>
+          <button
+            className="btn btn-outline-danger"
+            onClick={() =>
+              showModal({
+                title: "Confirmar cancelamento",
+                body: "Você tem certeza que deseja cancelar este pedido?",
+                onConfirm: handleCancel,
+                confirmText: "Sim, cancelar",
+                cancelText: "Não",
+                variant: "danger",
+              })
+            }
+          >
             Cancelar Pedido
           </button>
         </div>

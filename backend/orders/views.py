@@ -28,12 +28,23 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 class OrderItemViewSet(viewsets.ModelViewSet):
     serializer_class = OrderItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return OrderItem.objects.filter(order__user=self.request.user)
 
-    def get_permissions(self):
-        return [permissions.IsAuthenticated()]
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        
+        # Impede exclusão se o pedido não for "Novo"
+        if instance.order.status != 'N':
+            return Response(
+                {"detail": "Itens só podem ser excluídos se o pedido estiver com status 'Novo'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
 class OrderStatusLogListView(generics.ListAPIView):
     serializer_class = OrderStatusLogSerializer
@@ -41,7 +52,6 @@ class OrderStatusLogListView(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = OrderStatusLog.objects.all()
-
         order_id = self.request.query_params.get('order')
         user_id = self.request.query_params.get('user')
 

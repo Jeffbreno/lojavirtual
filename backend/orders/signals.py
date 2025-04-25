@@ -54,11 +54,13 @@ def create_initial_status_log(sender, instance, created, **kwargs):
     if created:
         # Evita duplicar caso o log já exista (por segurança)
         if not instance.status_logs.exists():
-            OrderStatusLog.objects.create(
-                order=instance,
-                status=instance.status,
-                changed_by=get_current_user(),
-            )
+            user = get_current_user()
+            if user and user.is_authenticated:
+                OrderStatusLog.objects.create(
+                    order=instance,
+                    status=instance.status,
+                    changed_by=user,
+                )
 
 # Cria log quando o status do pedido muda
 @receiver(pre_save, sender=Order)
@@ -72,9 +74,11 @@ def log_order_status_change(sender, instance, **kwargs):
         return
 
     if previous.status != instance.status:
-        OrderStatusLog.objects.create(
-            order=instance,
-            status=instance.status,
-            changed_at=now(),
-            changed_by=get_current_user()
-        )
+        user = get_current_user()
+        if user and user.is_authenticated:
+            OrderStatusLog.objects.create(
+                order=instance,
+                status=instance.status,
+                changed_at=now(),
+                changed_by=user,
+            )

@@ -3,7 +3,6 @@ import api from '../services/http';
 // Listar todos os pedidos do usuário logado
 export const fetchUserOrders = async () => {
   const response = await api.get('/orders/');
-  console.log(response.data);
   return response.data;
 };
 
