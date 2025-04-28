@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Order, OrderItem
+from .models import Order, OrderItem, CartItem
 from .models import OrderStatusLog
 
 class OrderStatusLogSerializer(serializers.ModelSerializer):
@@ -104,3 +104,11 @@ class OrderCreateSerializer(serializers.Serializer):
         if not data.get('items'):
             raise serializers.ValidationError("Lista de itens não pode estar vazia.")
         return data
+
+class CartItemSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='product.name', read_only=True)
+    price = serializers.DecimalField(source='product.price', max_digits=10, decimal_places=2, read_only=True)
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'name', 'quantity', 'price', 'added_at']

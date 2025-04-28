@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { fetchProducts } from "../api/products";
 import { Button, Carousel } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import ImageZoomModal from "../components/ImageZoomModal";
-import { CartContext } from "../contexts/CartContext";
+import { useCart } from "../contexts/CartContext";
 
 const ProductListPage = () => {
   const [products, setProducts] = useState([]);
@@ -25,7 +25,7 @@ const ProductListPage = () => {
     setShowZoom(true);
   };
 
-  const { addToCart } = useContext(CartContext);
+  const { addToCart } = useCart();
 
   const handleAddToCart = (product) => {
     addToCart(product);

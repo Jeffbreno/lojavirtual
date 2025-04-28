@@ -1,11 +1,11 @@
-from rest_framework import viewsets, permissions
-from .models import Order, OrderItem
-from .serializers import OrderSerializer, OrderItemSerializer
+from rest_framework import viewsets, permissions, generics, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import Order, OrderItem, CartItem
+from .serializers import OrderSerializer, OrderItemSerializer, CartItemSerializer
 from users.permissions import IsClientUser
-from rest_framework import generics
 from .models import OrderStatusLog
 from .serializers import OrderStatusLogSerializer
-from rest_framework.permissions import IsAuthenticated
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
@@ -48,7 +48,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     
 class OrderStatusLogListView(generics.ListAPIView):
     serializer_class = OrderStatusLogSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         queryset = OrderStatusLog.objects.all()
@@ -61,3 +61,27 @@ class OrderStatusLogListView(generics.ListAPIView):
             queryset = queryset.filter(changed_by_id=user_id)
 
         return queryset.order_by('-changed_at')
+
+class CartItemViewSet(viewsets.ModelViewSet):
+    serializer_class = CartItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return CartItem.objects.filter(user=self.request.user)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)  
+        return Response(status=status.HTTP_204_NO_CONTENT)  
+        
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    
+    @action(detail=False, methods=['delete'], url_path='clear')
+    def clear(self, request):
+        """Limpa todos os itens do carrinho do usuário atual."""
+        cart_items_deleted, _ = CartItem.objects.filter(user=request.user).delete()
+        if cart_items_deleted > 0:
+            return Response({"message": "Carrinho limpo com sucesso."}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({"message": "Carrinho já estava vazio."}, status=status.HTTP_200_OK)

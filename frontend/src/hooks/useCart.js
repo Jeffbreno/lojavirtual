@@ -1,22 +1,50 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { useAuth } from "./AuthContext";
-import * as cartApi from "../api/cart";
+import { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import {
+  getCartItems,
+  addToCart as apiAddToCart,
+  updateCartItem as apiUpdateCartItem,
+  removeCartItem as apiRemoveCartItem,
+  clearCart as apiClearCart,
+} from "../api/cart";
 
 const LOCAL_STORAGE_KEY = "cart";
 
-export const CartContext = createContext();
-
-export const CartProvider = ({ children }) => {
+const useCart = () => {
   const { user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
+  // Carregar carrinho ao iniciar ou sincronizar localStorage ao logar
   useEffect(() => {
     const loadCart = async () => {
       if (user) {
         try {
           setLoading(true);
-          const backendCart = await cartApi.getCartItems();
+
+          // 1. Primeiro, ver se existe carrinho salvo no localStorage
+          const savedCart = localStorage.getItem(LOCAL_STORAGE_KEY);
+
+          if (savedCart) {
+            const localItems = JSON.parse(savedCart);
+            // 2. Para cada item salvo no localStorage, tentar adicionar ao carrinho do backend
+            for (const item of localItems) {
+              try {
+                await apiAddToCart(item.id || item.product, item.quantity);
+              } catch (error) {
+                console.error(
+                  "Erro ao sincronizar item do localStorage:",
+                  error
+                );
+              }
+            }
+
+            // 3. Depois de sincronizar, limpar o localStorage para evitar duplicar
+            localStorage.removeItem(LOCAL_STORAGE_KEY);
+          }
+
+          // 4. Agora carregar o carrinho atualizado do servidor
+          const backendCart = await getCartItems();
           setCartItems(backendCart);
         } catch (error) {
           console.error("Erro ao carregar carrinho do servidor:", error);
@@ -24,6 +52,7 @@ export const CartProvider = ({ children }) => {
           setLoading(false);
         }
       } else {
+        // Se não estiver logado, carregar do localStorage normalmente
         const savedCart = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (savedCart) {
           setCartItems(JSON.parse(savedCart));
@@ -34,6 +63,7 @@ export const CartProvider = ({ children }) => {
     loadCart();
   }, [user]);
 
+  // Salvar no localStorage sempre que mudar e não tiver user
   useEffect(() => {
     if (!user) {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cartItems));
@@ -43,10 +73,12 @@ export const CartProvider = ({ children }) => {
   const addToCart = async (product, quantity = 1) => {
     if (user) {
       try {
-        const newItem = await cartApi.addToCart(product.id, quantity);
+        console.log("Adicionando ao carrinho (backend):", product);
+        console.log("Quantidade:", quantity);
+        const newItem = await apiAddToCart(product.id, quantity);
         setCartItems((prev) => [...prev, newItem]);
       } catch (error) {
-        console.error("Erro ao adicionar ao carrinho:", error);
+        console.error("Erro ao adicionar ao carrinho (backend):", error);
       }
     } else {
       setCartItems((prev) => {
@@ -66,7 +98,7 @@ export const CartProvider = ({ children }) => {
   const updateCartItem = async (id, quantity) => {
     if (user) {
       try {
-        const updatedItem = await cartApi.updateCartItem(id, quantity);
+        const updatedItem = await apiUpdateCartItem(id, quantity);
         setCartItems((prev) =>
           prev.map((item) => (item.id === id ? updatedItem : item))
         );
@@ -83,7 +115,7 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = async (id) => {
     if (user) {
       try {
-        await cartApi.removeCartItem(id);
+        await apiRemoveCartItem(id);
         setCartItems((prev) => prev.filter((item) => item.id !== id));
       } catch (error) {
         console.error("Erro ao remover item do carrinho:", error);
@@ -96,7 +128,7 @@ export const CartProvider = ({ children }) => {
   const clearCart = async () => {
     if (user) {
       try {
-        await cartApi.clearCart();
+        await apiClearCart();
         setCartItems([]);
       } catch (error) {
         console.error("Erro ao limpar carrinho:", error);
@@ -107,26 +139,14 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  return (
-    <CartContext.Provider
-      value={{
-        cartItems,
-        addToCart,
-        updateCartItem,
-        removeFromCart,
-        clearCart,
-        loading,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
-  );
+  return {
+    cartItems,
+    addToCart,
+    updateCartItem,
+    removeFromCart,
+    clearCart,
+    loading,
+  };
 };
 
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart precisa ser usado dentro do CartProvider");
-  }
-  return context;
-};
+export default useCart;

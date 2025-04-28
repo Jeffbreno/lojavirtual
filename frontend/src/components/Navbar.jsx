@@ -1,7 +1,6 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { CartContext } from "../contexts/CartContext";
 import {
   FaSignInAlt,
   FaSignOutAlt,
@@ -9,11 +8,12 @@ import {
   FaStore,
   FaShoppingCart,
 } from "react-icons/fa";
+import { useCart } from "../contexts/CartContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { cartItems } = useContext(CartContext);
+  const { cartItems } = useCart();
 
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
