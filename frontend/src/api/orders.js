@@ -16,13 +16,19 @@ export const getOrderById = async (id) => {
 export const createOrder = async (items) => {
   const payload = {
     items: items.map(item => ({
-      product: item.id,
+      product: item.product,
       quantity: item.quantity
     }))
   };
 
   const response = await api.post('/orders/', payload);
   return response.data;
+};
+
+// Atualizar status do pedido
+export const updateOrderStatus = (orderId, newStatus) => {
+  const response = api.patch(`/orders/${orderId}/`, { status: newStatus });
+  return response;
 };
 
 // Cancelar pedido

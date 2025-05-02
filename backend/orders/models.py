@@ -1,11 +1,11 @@
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from users.models import User
+from users.models import User, Address
 from products.models import Product
 
 class OrderStatus(models.TextChoices):
-    NEW = 'N', _('Novo')
+    NEW = 'N', _('Aguardando pagamento')
     PROCESSING = 'P', _('Processando')
     PAID = 'PA', _('Pago')
     SHIPPED = 'S', _('Enviado')
@@ -25,7 +25,16 @@ class OrderStatusLog(models.Model):
         return f"{self.order.id} - {self.status} - {self.changed_at.strftime('%d/%m/%Y %H:%M')}"
 
 class Order(models.Model):
+    PAYMENT_CHOICES = [
+        ('pix', 'Pix'),
+        ('boleto', 'Boleto'),
+        ('credito', 'Cartão de Crédito'),
+        ('debito', 'Cartão de Débito'),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='credito')
     status = models.CharField(max_length=2, choices=OrderStatus.choices, default=OrderStatus.NEW)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)

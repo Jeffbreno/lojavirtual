@@ -1,12 +1,16 @@
 import React from "react";
+import PrivateRoute from "./routes/PrivateRoute";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// CONTEXTS
 import { useAuth } from "./contexts/AuthContext";
+// COMPONENTS
 import Spinner from "./components/Spinner";
 import Navbar from "./components/Navbar";
-import LoginPage from "./pages/LoginPage";
+import RequireAuth from "./components/RequireAuth";
+// PAGES
 import ProfilePage from "./pages/ProfilePage";
+import LoginPage from "./pages/LoginPage";
 import LogoutPage from "./pages/LogoutPage";
-import PrivateRoute from "./routes/PrivateRoute";
 import ProductListPage from "./pages/ProductListPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
@@ -14,7 +18,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import PedidoFinalizadoPage from "./pages/PedidoFinalizadoPage";
 import MeusPedidosPage from "./pages/MeusPedidosPage";
 import MeusPedidoDetalhesPage from "./pages/MeusPedidosDetalhePage";
-import RequireAuth from "./components/RequireAuth";
+import CheckoutFinalPage from "./pages/CheckoutFinalPage";
 
 function App() {
   const { loading } = useAuth();
@@ -44,6 +48,7 @@ function App() {
           }
         />
         <Route path="/meus-pedidos/:id" element={<MeusPedidoDetalhesPage />} />
+        <Route path="/checkout/endereco" element={<CheckoutFinalPage />} />
         <Route
           path="/profile"
           element={

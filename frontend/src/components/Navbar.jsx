@@ -15,7 +15,8 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const { cartItems } = useCart();
 
-  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  // const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const totalItems = (cartItems || []).reduce((acc, item) => acc + item.quantity, 0);
 
   const handleLogout = () => {
     logout();

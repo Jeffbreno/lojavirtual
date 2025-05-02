@@ -1,9 +1,22 @@
 import { useCart } from "../contexts/CartContext";
 import { useNavigate } from "react-router-dom";
+import useNotification from "../hooks/useNotification";
+import GenericModal from "../components/GenericModal";
+import ToastMessage from "../components/ToastMessage";
 
 const CartPage = () => {
   const { cartItems, updateCartItem, removeFromCart } = useCart();
   const navigate = useNavigate();
+
+  const {
+    toast,
+    showToast,
+    hideToast,
+    modal,
+    showModal,
+    hideModal,
+    confirmModal,
+  } = useNotification();
 
   const total = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
@@ -15,7 +28,7 @@ const CartPage = () => {
     if (!isAuthenticated) {
       navigate("/login");
     } else {
-      navigate("/checkout");
+      navigate("/checkout/endereco");
     }
   };
 
@@ -31,14 +44,36 @@ const CartPage = () => {
     updateCartItem(item.id, item.quantity + 1);
   };
 
-  const handleRemove = (item) => {
-    if (window.confirm("Deseja remover este item do carrinho?")) {
-      removeFromCart(item.id);
+  const handleRemove = async (item) => {
+    try {
+      await removeFromCart(item.id);
+      showToast("Produto removido do carrinho.");
+    } catch (error) {
+      showToast("Erro ao cancelar o pedido.", "danger");
+    } finally {
+      hideModal();
     }
   };
 
   return (
     <div className="container mt-4">
+      <ToastMessage
+        show={toast.show}
+        message={toast.message}
+        variant={toast.variant}
+        onClose={() => hideToast()}
+      />
+
+      <GenericModal
+        show={modal.show}
+        title={modal.title}
+        body={modal.body}
+        confirmText={modal.confirmText}
+        cancelText={modal.cancelText}
+        onConfirm={confirmModal}
+        onClose={hideModal}
+        variant={modal.variant}
+      />
       <h2>Carrinho de Compras</h2>
       {cartItems.length === 0 ? (
         <p>Seu carrinho está vazio.</p>
@@ -78,7 +113,16 @@ const CartPage = () => {
                   </strong>
                   <button
                     className="btn btn-danger btn-sm"
-                    onClick={() => handleRemove(item)}
+                    onClick={() =>
+                      showModal({
+                        title: "Confirmar remover item",
+                        body: "Deseja remover este item do carrinho?",
+                        onConfirm: () => handleRemove(item),
+                        confirmText: "Sim, cancelar",
+                        cancelText: "Não",
+                        variant: "danger",
+                      })
+                    }
                   >
                     Remover
                   </button>
@@ -90,7 +134,7 @@ const CartPage = () => {
           <div className="d-flex justify-content-between align-items-center">
             <h4>Total: R$ {total.toFixed(2)}</h4>
             <button className="btn btn-success" onClick={handleCheckout}>
-              Finalizar Compra
+              Fechar Pedido
             </button>
           </div>
         </>
