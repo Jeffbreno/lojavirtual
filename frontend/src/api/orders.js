@@ -13,15 +13,9 @@ export const getOrderById = async (id) => {
 };
 
 // Criar novo pedido
-export const createOrder = async (items) => {
-  const payload = {
-    items: items.map(item => ({
-      product: item.product,
-      quantity: item.quantity
-    }))
-  };
-
-  const response = await api.post('/orders/', payload);
+export const createOrder = async (orderData) => {
+  console.log('Order Data:', orderData);
+  const response = await api.post('/orders/', orderData);
   return response.data;
 };
 

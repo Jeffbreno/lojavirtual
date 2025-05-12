@@ -57,13 +57,21 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'status', 'status_display', 'total', 'created_at', 'updated_at', 'items', 'status_logs']
+        fields = ['id', 'user', 'address', 'payment_method', 'status', 'status_display', 'total', 'created_at', 'updated_at', 'items', 'status_logs']
         read_only_fields = ['user', 'total', 'created_at', 'updated_at']
 
     def create(self, validated_data):
         items_data = validated_data.pop('items')
         user = self.context['request'].user
-        order = Order.objects.create(user=user, status='N', total=0)
+
+        # validated_data.pop('user', None)
+
+        order = Order.objects.create(
+            user=user, 
+            address=validated_data.get('address'),
+            payment_method=validated_data.get('payment_method'),
+            status='N',
+        )
 
         for item in items_data:
             product = item['product']

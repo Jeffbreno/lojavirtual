@@ -113,14 +113,11 @@ const CheckoutFinalPage = () => {
       const orderData = {
         address: selectedAddressId,
         items: cartItems.map((item) => ({
-          product: item.id,
+          product: item.product,
           quantity: item.quantity
         })),
         payment_method: paymentMethod
       };
-
-      console.log("Cart Items:", cartItems);
-
 
       const order = await createOrder(orderData);
       clearCart();

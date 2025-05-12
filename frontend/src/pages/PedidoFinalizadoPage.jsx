@@ -12,6 +12,7 @@ const PedidoFinalizadoPage = () => {
     const fetchOrder = async () => {
       try {
         const result = await getOrderById(id);
+        console.log("Pedido:", result);
         setOrder(result);
       } catch (error) {
         console.error("Erro ao buscar pedido:", error);
@@ -65,7 +66,7 @@ const PedidoFinalizadoPage = () => {
     <div className="container mt-4">
       <h2>Pedido Finalizado</h2>
       <p>ID do Pedido: <strong>{order.id}</strong></p>
-      <p>Valor Total: <strong>R$ {order.total_price.toFixed(2)}</strong></p>
+      <p>Valor Total: <strong>R$ {Number(order.total || 0).toFixed(2)}</strong></p>
 
       <hr />
       {renderPagamento()}
