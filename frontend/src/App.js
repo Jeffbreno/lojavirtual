@@ -19,7 +19,7 @@ import PedidoFinalizadoPage from "./pages/PedidoFinalizadoPage";
 import MeusPedidosPage from "./pages/MeusPedidosPage";
 import MeusPedidoDetalhesPage from "./pages/MeusPedidosDetalhePage";
 import CheckoutFinalPage from "./pages/CheckoutFinalPage";
-import AdminPedidosPage from "./pages/AdminPedidosPage";
+import AdminPedidosPage from "./pages/admin/AdminPedidosPage";
 
 function App() {
   const { loading } = useAuth();
