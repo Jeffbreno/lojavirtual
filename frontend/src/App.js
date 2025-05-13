@@ -19,6 +19,7 @@ import PedidoFinalizadoPage from "./pages/PedidoFinalizadoPage";
 import MeusPedidosPage from "./pages/MeusPedidosPage";
 import MeusPedidoDetalhesPage from "./pages/MeusPedidosDetalhePage";
 import CheckoutFinalPage from "./pages/CheckoutFinalPage";
+import AdminPedidosPage from "./pages/AdminPedidosPage";
 
 function App() {
   const { loading } = useAuth();
@@ -49,6 +50,7 @@ function App() {
         />
         <Route path="/meus-pedidos/:id" element={<MeusPedidoDetalhesPage />} />
         <Route path="/checkout/endereco" element={<CheckoutFinalPage />} />
+         <Route path="/admin/pedidos" element={<AdminPedidosPage />} />
         <Route
           path="/profile"
           element={

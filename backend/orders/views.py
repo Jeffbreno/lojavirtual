@@ -7,6 +7,11 @@ from users.permissions import IsClientUser
 from .models import OrderStatusLog
 from .serializers import OrderStatusLogSerializer
 
+class AdminOrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
 
