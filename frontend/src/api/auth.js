@@ -30,6 +30,11 @@ export const getProfile = async () => {
   return response.data;
 };
 
+export const verifyEmail = async (email, code) => {
+  const response = await api.post("/auth/verify-email/", { email, code });
+  return response.data;
+};
+
 export const refreshToken = async () => {
   const refresh = localStorage.getItem('refresh');
   const response = await api.post('/token/refresh/', { refresh });

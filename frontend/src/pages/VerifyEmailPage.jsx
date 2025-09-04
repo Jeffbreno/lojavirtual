@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import api from "../services/http";
+import { verifyEmail } from "../api/auth";
 
 const VerifyEmailPage = () => {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const VerifyEmailPage = () => {
     setError("");
     setLoading(true);
     try {
-      const resp = await api.post("/auth/verify-email/", { email, code });
+      const resp = await verifyEmail(email, code);
       setSuccess(true);
       setTimeout(() => {
         navigate("/login");

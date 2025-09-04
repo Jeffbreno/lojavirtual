@@ -9,7 +9,7 @@ router.register(r'addresses', AddressViewSet, basename='address')
 urlpatterns = [
     path('', include(router.urls)),
     path('register/', RegisterView.as_view(), name='register'),
-    path('auth/verify-email/', VerifyEmailView.as_view(), name='verify-email'),
+    path('verify-email/', VerifyEmailView.as_view(), name='verify-email'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('admin-only/', AdminOnlyView.as_view(), name='admin-only'),
     path('seller-only/', SellerOnlyView.as_view(), name='seller-only'),
