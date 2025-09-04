@@ -25,7 +25,7 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     if (!user) {
-      navigate("/login");
+      navigate("/login", { state: { from: "/checkout" } });
     }
   }, [user, navigate]);
 

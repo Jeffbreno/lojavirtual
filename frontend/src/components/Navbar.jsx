@@ -85,6 +85,13 @@ const Navbar = () => {
                         Meus Pedidos
                       </Link>
                     </li>
+                    {user.user_type === 'A' && (
+                      <li>
+                        <Link className="dropdown-item text-primary" to="/admin/pedidos">
+                          Painel Admin
+                        </Link>
+                      </li>
+                    )}
                     <li>
                       <hr className="dropdown-divider" />
                     </li>

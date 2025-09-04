@@ -26,8 +26,8 @@ export const AuthProvider = ({ children }) => {
     initializeUser();
   }, []);
 
-  const login = async (username, password) => {
-    await loginUser(username, password); 
+  const login = async (email, password) => {
+    await loginUser(email, password); 
     await fetchProfile();  
   };
 

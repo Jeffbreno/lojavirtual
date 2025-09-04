@@ -6,6 +6,7 @@ import { format } from "date-fns";
 const AdminPedidosPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,9 +50,9 @@ const AdminPedidosPage = () => {
             {orders.map((order) => (
               <tr key={order.id}>
                 <td>{order.id}</td>
-                <td>{order.user_name || "Anônimo"}</td>
+                <td>{order.user_name || order.user}</td>
                 <td>{format(new Date(order.created_at), "dd/MM/yyyy")}</td>
-                <td>R$ {order.total_price.toFixed(2)}</td>
+                <td>R$ {order.total ? Number(order.total).toFixed(2) : "0,00"}</td>
                 <td>{order.status_display}</td>
                 <td>{order.payment_method}</td>
                 <td>

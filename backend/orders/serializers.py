@@ -1,6 +1,12 @@
+from users.models import Address
 from rest_framework import serializers
 from .models import Order, OrderItem, CartItem
 from .models import OrderStatusLog
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = ['id', 'street', 'number', 'complement', 'district', 'city', 'state', 'zip_code', 'is_default']
 
 class OrderStatusLogSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,12 +54,14 @@ class OrderItemSerializer(serializers.ModelSerializer):
             validated_data['price'] = product.price
         return super().update(instance, validated_data)
 
+
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
     created_at = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
     total = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     status_logs = OrderStatusLogSerializer(many=True, read_only=True)
+    address = AddressSerializer(read_only=True)
 
     class Meta:
         model = Order

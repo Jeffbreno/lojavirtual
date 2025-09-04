@@ -8,7 +8,7 @@ const LoginPage = () => {
   const location = useLocation();
   const { login } = useAuth();
   const [credentials, setCredentials] = useState({
-    username: "",
+    email: "",
     password: "",
   });
   const [error, setError] = useState("");
@@ -22,7 +22,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(credentials.username, credentials.password);
+      await login(credentials.email, credentials.password);
       navigate(from, { replace: true }); 
     } catch (err) {
       setError("Usuário ou senha inválidos");
@@ -40,16 +40,16 @@ const LoginPage = () => {
 
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
-          <label htmlFor="username" className="form-label">
+          <label htmlFor="email" className="form-label">
             <FaUser className="me-1" />
-            Usuário
+            E-mail
           </label>
           <input
-            type="text"
+            type="email"
             className="form-control"
-            id="username"
-            name="username"
-            value={credentials.username}
+            id="email"
+            name="email"
+            value={credentials.email}
             onChange={handleChange}
             required
           />
@@ -75,6 +75,11 @@ const LoginPage = () => {
           <FaSignInAlt className="me-2" />
           Entrar
         </button>
+        
+        <div className="mt-3 text-center">
+          <span>Não tem conta?</span>
+          <a href="/cadastro" className="ms-2">Cadastre-se</a>
+        </div>
       </form>
     </div>
   );

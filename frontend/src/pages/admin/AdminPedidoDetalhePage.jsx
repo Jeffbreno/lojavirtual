@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getOrderById, updateOrderStatus } from "../api/orders";
+import { getOrderByIdAdmin, updateOrderStatus } from "../../api/orders";
 
 const AdminPedidoDetalhePage = () => {
   const { id } = useParams();
@@ -12,7 +12,7 @@ const AdminPedidoDetalhePage = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const result = await getOrderById(id);
+        const result = await getOrderByIdAdmin(id);
         setOrder(result);
         setNewStatus(result.status);
       } catch (error) {
@@ -41,8 +41,8 @@ const AdminPedidoDetalhePage = () => {
 
   return (
     <div className="container mt-4">
-      <h2>Detalhes do Pedido #{order.id}</h2>
-      <p><strong>Status Atual:</strong> {order.status}</p>
+  <h2>Detalhes do Pedido #{order.id}</h2>
+  <p><strong>Status Atual:</strong> {order.status_display}</p>
 
       <div className="form-group mt-3">
         <label>Alterar Status:</label>
@@ -51,10 +51,8 @@ const AdminPedidoDetalhePage = () => {
           value={newStatus}
           onChange={(e) => setNewStatus(e.target.value)}
         >
-          <option value="P">Pendente</option>
-          <option value="E">Em Preparo</option>
+          <option value="P">Processando</option>
           <option value="S">Enviado</option>
-          <option value="D">Entregue</option>
           <option value="C">Cancelado</option>
         </select>
         <button
@@ -70,8 +68,15 @@ const AdminPedidoDetalhePage = () => {
       <hr />
       <h5>Endereço de Entrega</h5>
       <p>
-        {order.address?.street}, {order.address?.number} - {order.address?.neighborhood} <br />
-        {order.address?.city} - {order.address?.state}, {order.address?.zip_code}
+        {order.address
+          ? (
+            <>
+              {order.address.street}, {order.address.number} {order.address.complement && `- ${order.address.complement}`}<br />
+              {order.address.district} - {order.address.city}/{order.address.state}, {order.address.zip_code}
+            </>
+          )
+          : <span>Endereço não informado</span>
+        }
       </p>
 
       <hr />
@@ -87,8 +92,8 @@ const AdminPedidoDetalhePage = () => {
 
       <hr />
       <h5>Resumo</h5>
-      <p><strong>Total:</strong> R$ {order.total_price.toFixed(2)}</p>
-      <p><strong>Método de Pagamento:</strong> {order.payment_method.toUpperCase()}</p>
+  <p><strong>Total:</strong> R$ {order.total ? Number(order.total).toFixed(2) : "0,00"}</p>
+  <p><strong>Método de Pagamento:</strong> {order.payment_method.toUpperCase()}</p>
     </div>
   );
 };

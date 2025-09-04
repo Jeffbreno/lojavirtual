@@ -36,3 +36,15 @@ export const deleteOrderItem = async (itemId) => {
   const response = await api.delete(`/order-items/${itemId}/`);
   return response.data;
 };
+
+// Buscar todos os pedidos como admin
+export const fetchAllOrdersAdmin = async () => {
+  const response = await api.get('/admin/orders/');
+  return response.data;
+};
+
+// Buscar detalhes de um pedido como admin
+export const getOrderByIdAdmin = async (id) => {
+  const response = await api.get(`/admin/orders/${id}/`);
+  return response.data;
+};

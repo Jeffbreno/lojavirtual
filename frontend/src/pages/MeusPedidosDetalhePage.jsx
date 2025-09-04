@@ -123,6 +123,22 @@ const MeusPedidosDetalhePage = () => {
         </li>
       </ul>
 
+      <hr />
+      <h5>Endereço de Entrega</h5>
+      <p>
+        {order.address ? (
+          <>
+            {order.address.street}, {order.address.number}{" "}
+            {order.address.complement && `- ${order.address.complement}`}
+            <br />
+            {order.address.district} - {order.address.city}/
+            {order.address.state}, {order.address.zip_code}
+          </>
+        ) : (
+          <span>Endereço não informado</span>
+        )}
+      </p>
+
       {podeCancelar && (
         <div className="text-end">
           <button

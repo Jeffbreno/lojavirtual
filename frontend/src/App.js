@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar";
 import RequireAuth from "./components/RequireAuth";
 // PAGES
 import ProfilePage from "./pages/ProfilePage";
+import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import LogoutPage from "./pages/LogoutPage";
 import ProductListPage from "./pages/ProductListPage";
@@ -21,6 +22,8 @@ import MeusPedidoDetalhesPage from "./pages/MeusPedidosDetalhePage";
 import CheckoutFinalPage from "./pages/CheckoutFinalPage";
 import AdminPedidosPage from "./pages/admin/AdminPedidosPage";
 import AdminPedidoDetalhePage from "./pages/admin/AdminPedidoDetalhePage";
+import RequireAdmin from "./components/RequireAdmin";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 
 function App() {
   const { loading } = useAuth();
@@ -33,6 +36,7 @@ function App() {
       <Routes>
         <Route path="/" element={<ProductListPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/cadastro" element={<RegisterPage />} />
         <Route path="/logout" element={<LogoutPage />} />
         <Route path="/produtos/:id" element={<ProductDetailPage />} />
         <Route path="/carrinho" element={<CartPage />} />
@@ -51,8 +55,16 @@ function App() {
         />
         <Route path="/meus-pedidos/:id" element={<MeusPedidoDetalhesPage />} />
         <Route path="/checkout/endereco" element={<CheckoutFinalPage />} />
-         <Route path="/admin/pedidos" element={<AdminPedidosPage />} />
-         <Route path="/admin/pedidos/:id" element={<AdminPedidoDetalhePage />} />
+        <Route path="/admin/pedidos" element={
+          <RequireAdmin>
+            <AdminPedidosPage />
+          </RequireAdmin>
+        } />
+        <Route path="/admin/pedidos/:id" element={
+          <RequireAdmin>
+            <AdminPedidoDetalhePage />
+          </RequireAdmin>
+        } />
 
         <Route
           path="/profile"
@@ -62,6 +74,7 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
       </Routes>
     </Router>
   );
